@@ -8,6 +8,8 @@ written in easy to read JavaScript.
 Reading through the guided code will help you learn about how *most* compilers
 work from end to end.
 
+English | [简体中文](README-zh_CN.md)
+
 ### [Want to jump into the code? Click here](the-super-tiny-compiler.js)
 
 ### [You can also check it out on Glitch](https://the-super-tiny-compiler.glitch.me/)
