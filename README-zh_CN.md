@@ -1,3 +1,5 @@
+[English](README.md) | 简体中文
+
 [![超级微型编译器](https://cloud.githubusercontent.com/assets/952783/21579290/5755288a-cf75-11e6-90e0-029529a44a38.png)](the-super-tiny-compiler-zh_CN.js)
 
 ***欢迎来到超级微型编译器!***
@@ -5,8 +7,6 @@
 这是现代编译器所有主要部分的一个超级简化示例写在易于阅读的JavaScript。
 
 阅读指导代码将帮助您了解如何*大多数*编译器从头到尾地工作。
-
-[English](README.md) | 简体中文
 
 ### [想要进入代码? 点击这里](the-super-tiny-compiler-zh_CN.js)
 

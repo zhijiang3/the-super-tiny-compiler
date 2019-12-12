@@ -76,23 +76,12 @@
  */
 
 /**
- * Today we're going to write a compiler together. But not just any compiler... A
- * super duper teeny tiny compiler! A compiler that is so small that if you
- * remove all the comments this file would only be ~200 lines of actual code.
- *
  * 今天我们将一起编写一个编译器。但不仅限于任何编译器...这是一个超级傻瓜式微型编译器!
  * 一个非常小的编译器，如果你删除所有注释，此文件实际上只有 200 行左右的代码。
  *
- * We're going to compile some lisp-like function calls into some C-like
- * function calls.
- *
  * 我们将把一些类似 LISP(计算机程序设计语言) 的函数调用编译成一些类似 C 函数调用。
  *
- * If you are not familiar with one or the other. I'll just give you a quick intro.
- *
  * 如果你不熟悉其中之一，我会简单的给你介绍一下。
- *
- * If we had two functions `add` and `subtract` they would be written like this:
  *
  * 如果我们有两个函数 `add` 和 `subtract` 它们的写法如下：
  *
@@ -102,88 +91,44 @@
  *   4 - 2          (subtract 4 2)            subtract(4, 2)
  *   2 + (4 - 2)    (add 2 (subtract 4 2))    add(2, subtract(4, 2))
  *
- * Easy peezy right?
- *
  * 相当的简单对吧？
  *
- * Well good, because this is exactly what we are going to compile. While this
- * is neither a complete LISP or C syntax, it will be enough of the syntax to
- * demonstrate many of the major pieces of a modern compiler.
- * 
  * 很好，因为这正是我们需要编译的内容。虽然这些既不是完整的 LISP(计算机程序设计语言)
  * 语法，也不是完整的 C 语法，但对于现代编译器的许多主要部分来说已经足够。
  */
 
 /**
- * Most compilers break down into three primary stages: Parsing, Transformation,
- * and Code Generation
- * 
  * 大多数编译器分为三个主要阶段：解析，转化 和 代码生成
  *
- * 1. *Parsing* is taking raw code and turning it into a more abstract
- *    representation of the code.
- * 
  * 1. *解析* 是将原始代码转换为更抽象的代码表示形式。
  *
- * 2. *Transformation* takes this abstract representation and manipulates to do
- *    whatever the compiler wants it to.
- * 
  * 2 *转化* 获取抽象代码的表示形式并进行操作以执行编译器希望它执行的任何操作。
  *
- * 3. *Code Generation* takes the transformed representation of the code and
- *    turns it into new code.
- * 
  * 3. *代码生成* 将转换后的抽象代码转换为新代码
  */
 
 /**
- * Parsing
- * -------
- *
  * 解析
  * ----
  *
- * Parsing typically gets broken down into two phases: Lexical Analysis and
- * Syntactic Analysis.
- *
  * 解析通常分为两个阶段：词法解析 和 语法解析。
- *
- * 1. *Lexical Analysis* takes the raw code and splits it apart into these things
- *    called tokens by a thing called a tokenizer (or lexer).
  *
  * 1. *词法解析* 获取原始代码并通过被称作分词器（或词法分析程序）的东西
  *    将其拆分为被称作令牌的东西。
  * 
- *    Tokens are an array of tiny little objects that describe an isolated piece
- *    of the syntax. They could be numbers, labels, punctuation, operators,
- *    whatever.
- *
  *    令牌是由微小的对象组成的数组，这些对象描述了一个独立的语法片段。它们
  *    可以是数字，标签，标点符号，运算符等等。
- *
- * 2. *Syntactic Analysis* takes the tokens and reformats them into a
- *    representation that describes each part of the syntax and their relation
- *    to one another. This is known as an intermediate representation or
- *    Abstract Syntax Tree.
  *
  * 2. *语法分析* 获取令牌并将令牌重新格式化为一种表示形式，该表示形式描述
  *    了语法的每个部分及其彼此之间的关系。这就是所谓的中间表示或抽象语法
  *    树。
  *
- *    An Abstract Syntax Tree, or AST for short, is a deeply nested object that
- *    represents code in a way that is both easy to work with and tells us a lot
- *    of information.
- * 
  *    抽象语法树，简称 AST，是一个嵌套很深的对象，它以一种既易于使用又能
  *    告诉我们很多信息的方式表示代码。
  *
- * For the following syntax:
- * 
  * 对于以下语法：
  *
  *   (add 2 (subtract 4 2))
- *
- * Tokens might look something like this:
  *
  * 令牌看起来可能是这样的：
  * 
@@ -198,8 +143,6 @@
  *     { type: 'paren',  value: ')'        },
  *     { type: 'paren',  value: ')'        },
  *   ]
- *
- * And an Abstract Syntax Tree (AST) might look like this:
  *
  * 然后抽象语法树看起来可能是这样的：
  * 
@@ -227,33 +170,16 @@
  */
 
 /**
- * Transformation
- * --------------
- *
  * 转换
  * ----
- *
- * The next type of stage for a compiler is transformation. Again, this just
- * takes the AST from the last step and makes changes to it. It can manipulate
- * the AST in the same language or it can translate it into an entirely new
- * language.
  *
  * 编译器的下一个阶段是转换。同样，这只是从最后一步获取抽象语法树并对其进行更改。
  * 它可以使用相同的语言来操作抽象语法，也可以将其转换成一个全新的语言。
  *
- * Let’s look at how we would transform an AST.
- *
  * 让我们看看如何转换抽象语法树。
- *
- * You might notice that our AST has elements within it that look very similar.
- * There are these objects with a type property. Each of these are known as an
- * AST Node. These nodes have defined properties on them that describe one
- * isolated part of the tree.
  *
  * 你可能会注意到，我们的抽象语法树的元素看起来非常的相似。这些对象具有 类型（type） 属性。
  * 这些都称为抽象语法树的 节点（node）。这些节点上定义了描述树的一个独立部分的属性。
- *
- * We can have a node for a "NumberLiteral":
  *
  * 我们可以有一个 "NumberLiteral" 节点：
  *
@@ -261,8 +187,6 @@
  *     type: 'NumberLiteral',
  *     value: '2',
  *   }
- *
- * Or maybe a node for a "CallExpression":
  *
  * 或者一个 "CallExpression" 节点：
  *
@@ -272,30 +196,15 @@
  *     params: [...nested nodes go here...],
  *   }
  *
- * When transforming the AST we can manipulate nodes by
- * adding/removing/replacing properties, we can add new nodes, remove nodes, or
- * we could leave the existing AST alone and create an entirely new one based
- * on it.
- *
  * 在转换抽象语法树时，我们可以通过添加/删除/替换属性来操作节点，我们可以
  * 添加节点，删除节点，也可以不使用现有的抽象语法树，而基于它创建一个全新的。
  *
- * Since we’re targeting a new language, we’re going to focus on creating an
- * entirely new AST that is specific to the target language.
- *
  * 因为我们的目标是一门新的语言，所以我们专注于创建一个特定于目标语言的全新抽象语法树。
- *
- * Traversal
- * ---------
  *
  * 遍历
  * ----
  *
- * In order to navigate through all of these nodes, we need to be able to
- * traverse through them. This traversal process goes to each node in the AST
- * depth-first.
- *
- * 为了浏览到所有的节点，我们需要能够遍历它们。这个遍历程序通过深度优先算法去遍历每一个节点。
+ * 为了浏览到所有的节点，我们需要能够遍历它们。这个遍历程序通过深度优先（depth-first）去遍历每一个节点。
  *
  *   {
  *     type: 'Program',
@@ -319,16 +228,7 @@
  *     }]
  *   }
  *
- * So for the above AST we would go:
- *
  * 对于上述抽象语法树的遍历方式如下：
- *
- *   1. Program - Starting at the top level of the AST
- *   2. CallExpression (add) - Moving to the first element of the Program's body
- *   3. NumberLiteral (2) - Moving to the first element of CallExpression's params
- *   4. CallExpression (subtract) - Moving to the second element of CallExpression's params
- *   5. NumberLiteral (4) - Moving to the first element of CallExpression's params
- *   6. NumberLiteral (2) - Moving to the second element of CallExpression's params
  *
  *   1. Program - 从抽象语法树的顶层开始
  *   2. CallExpression (add) - 移动到 Program 的主体的第一个元素上
@@ -337,26 +237,13 @@
  *   5. NumberLiteral (4) - 移动到 CallExpression (subtract) 的参数的第一个元素上
  *   6. NumberLiteral (2) - 移动到 CallExpression (subtract) 的参数的第二个元素上
  *
- * If we were manipulating this AST directly, instead of creating a separate AST,
- * we would likely introduce all sorts of abstractions here. But just visiting
- * each node in the tree is enough for what we're trying to do.
- *
  * 如果我们直接操作抽象语法树，而不是创建单独的抽象语法树，则可能会在此引入各种的抽象。
  * 但是，只需要访问树中的节点就可以完成我们要执行的操作。
  *
- * The reason I use the word "visiting" is because there is this pattern of how
- * to represent operations on elements of an object structure.
- *
- * 这里我之所以使用 “访问” 这个词，是因为存在这样一种模式来表示对象结构元素上的操作。
- *
- * Visitors
- * --------
+ * 这里我之所以使用 “访问（visiting）” 这个词，是因为存在这样一种模式来表示对象结构元素上的操作。
  *
  * 访问者
  * ------
- *
- * The basic idea here is that we are going to create a “visitor” object that
- * has methods that will accept different node types.
  *
  * 这里的基本思想是，我们将创建一个 “访问者（visitor）” 对象，该对象的方法将接受不同的节点类型。
  *
@@ -365,13 +252,7 @@
  *     CallExpression() {},
  *   };
  *
- * When we traverse our AST, we will call the methods on this visitor whenever we
- * "enter" a node of a matching type.
- *
  * 在遍历我们的抽象语法树时，每当我们 “进入（enter）” 到一个类型匹配的节点，就会调用访问者中对应的方法。
- *
- * In order to make this useful we will also pass the node and a reference to
- * the parent node.
  *
  * 为了使访问者能用，我们还将传递该节点和对父节点的引用。
  *
@@ -379,9 +260,6 @@
  *     NumberLiteral(node, parent) {},
  *     CallExpression(node, parent) {},
  *   };
- *
- * However, there also exists the possibility of calling things on "exit". Imagine
- * our tree structure from before in list form:
  *
  * 但是，也会有在离开节点时做一些事情。想象一下之前以列表形式的树结构。
  *
@@ -391,10 +269,6 @@
  *       - CallExpression
  *         - NumberLiteral
  *         - NumberLiteral
- *
- * As we traverse down, we're going to reach branches with dead ends. As we
- * finish each branch of the tree we "exit" it. So going down the tree we
- * "enter" each node, and going back up we "exit".
  *
  * 当我们向下遍历时，我们会到达有死胡同的分支。完成树的分支后，我们 “离开（exit）” 它。
  * 因此，沿着树向下，我们 “进入（enter）” 每个节点，然后返回上一级，“离开（exit）” 节点。
@@ -412,8 +286,6 @@
  *     <- CallExpression (exit)
  *   <- Program (exit)
  *
- * In order to support that, the final form of our visitor will look like this:
- *
  * 为了支持这个功能，最终我们的访问者看起来应该像这样：
  *
  *   var visitor = {
@@ -425,108 +297,89 @@
  */
 
 /**
- * Code Generation
- * ---------------
- *
  * 代码生成
  * --------
- *
- * The final phase of a compiler is code generation. Sometimes compilers will do
- * things that overlap with transformation, but for the most part code
- * generation just means take our AST and string-ify code back out.
  *
  * 编译器的最后一个阶段就是代码生成。有时候编译器会做一些与转换重叠的事情，但是
  * 大多数情况下代码生成只是把我们的抽象语法树字符化然后返回。
  *
- * Code generators work several different ways, some compilers will reuse the
- * tokens from earlier, others will have created a separate representation of
- * the code so that they can print node linearly, but from what I can tell most
- * will use the same AST we just created, which is what we’re going to focus on.
+ * 代码生成有好几种工作方式，有些编译器会重新使用早期的令牌，另一些编译器将创建代码
+ * 的单独表示，以便它们可以线性输出节点。但是据我所知，大多数编译器是使用像我们创建
+ * 的抽象语法树去生成代码，这个正是我们需要去关注的。
  *
- * Effectively our code generator will know how to “print” all of the different
- * node types of the AST, and it will recursively call itself to print nested
- * nodes until everything is printed into one long string of code.
+ * 实际上，我们的代码生成器知道如何 “打印” 抽象语法树所有不同类型的节点，
+ * 并且编译器会递归的调用自身去打印嵌套的节点，直到所有内容都打印到一个
+ * 长串代码中。
  */
 
 /**
- * And that's it! That's all the different pieces of a compiler.
+ * 就是这样！这些就是编译器所有的不同部分。
  *
- * Now that isn’t to say every compiler looks exactly like I described here.
- * Compilers serve many different purposes, and they might need more steps than
- * I have detailed.
+ * 这并不是说每个编译器都和我在这里描述的完全一样。编译器有许多不同的用途，
+ * 并且可能会比我详细介绍的步骤还要多更多的步骤。
  *
- * But now you should have a general high-level idea of what most compilers look
- * like.
+ * 但是现在你应该对大多数编译器有了大致的了解。
  *
- * Now that I’ve explained all of this, you’re all good to go write your own
- * compilers right?
+ * 现在我解释了所有的这些，你们都准备好编写你们自己的编译器了，对吗？
  *
- * Just kidding, that's what I'm here to help with :P
+ * 开玩笑的，这就是我在这提供帮助的点 :P
  *
- * So let's begin...
+ * 所以让我们开始吧...
  */
 
 /**
  * ============================================================================
  *                                   (/^▽^)/
- *                                THE TOKENIZER!
+ *                                 词法分析器!
  * ============================================================================
  */
 
 /**
- * We're gonna start off with our first phase of parsing, lexical analysis, with
- * the tokenizer.
+ * 我们将要开始我们的第一阶段的解析，使用词法解析其进行词法解析。
  *
- * We're just going to take our string of code and break it down into an array
- * of tokens.
+ * 我们只需要把我们的代码字符串分解成一个令牌数组。
  *
  *   (add 2 (subtract 4 2))   =>   [{ type: 'paren', value: '(' }, ...]
  */
 
-// We start by accepting an input string of code, and we're gonna set up two
-// things...
+// 我们首先接受一个输入字符串的代码，然后我们会设置两个东西
 function tokenizer(input) {
 
-  // A `current` variable for tracking our position in the code like a cursor.
+  // 一个 `current` 变量，用于像指针一样跟踪我们在代码中的位置。
   let current = 0;
 
-  // And a `tokens` array for pushing our tokens to.
+  // 以及一个 `tokens` 数组，存放我们收集的令牌。
   let tokens = [];
 
-  // We start by creating a `while` loop where we are setting up our `current`
-  // variable to be incremented as much as we want `inside` the loop.
+  // 我们首先创建一个 `while` 循环，将我们的 `current` 变量在该循环中自增。
   //
-  // We do this because we may want to increment `current` many times within a
-  // single loop because our tokens can be any length.
+  // 我们这样做是因为我们可能希望在一个循环中多次增加 `current`，因为我们的令牌
+  // 可以是任意长度的。
   while (current < input.length) {
 
-    // We're also going to store the `current` character in the `input`.
+    // 我们也存储 `current` 所指向的 `input` 对应的字符串。
     let char = input[current];
 
-    // The first thing we want to check for is an open parenthesis. This will
-    // later be used for `CallExpression` but for now we only care about the
-    // character.
+    // 首先要检查的是开括号。这将用于 `CallExpression` 但是现在我们只关心字符串。
     //
-    // We check to see if we have an open parenthesis:
+    // 我们检查看看是否有开括号：
     if (char === '(') {
 
-      // If we do, we push a new token with the type `paren` and set the value
-      // to an open parenthesis.
+      // 如果有，我们添加一个类型为 `paren` 的令牌，并将其值设置为开括号。
       tokens.push({
         type: 'paren',
         value: '(',
       });
 
-      // Then we increment `current`
+      // 自增 `current`
       current++;
 
-      // And we `continue` onto the next cycle of the loop.
+      // 然后我们进入下一个循环。
       continue;
     }
 
-    // Next we're going to check for a closing parenthesis. We do the same exact
-    // thing as before: Check for a closing parenthesis, add a new token,
-    // increment `current`, and `continue`.
+    // 下一步我们检查闭括号。我们和之前做的事情一样：检查是否是闭括号，然后
+    // 添加一个新的令牌，自增 `current` 然后进行下一个循环。
     if (char === ')') {
       tokens.push({
         type: 'paren',
@@ -536,160 +389,144 @@ function tokenizer(input) {
       continue;
     }
 
-    // Moving on, we're now going to check for whitespace. This is interesting
-    // because we care that whitespace exists to separate characters, but it
-    // isn't actually important for us to store as a token. We would only throw
-    // it out later.
+    // 继续，我们现在要检查空白符。这挺有意思的，因为我们关心空白符是否存在以分隔字符，
+    // 但实际上对于我们的令牌来说这并不重要。我们在之后会丢弃它。
     //
-    // So here we're just going to test for existence and if it does exist we're
-    // going to just `continue` on.
+    // 所以我们在这里将检查是否存在空白符，如果存在的话我们就进入下一个循环。
     let WHITESPACE = /\s/;
     if (WHITESPACE.test(char)) {
       current++;
       continue;
     }
 
-    // The next type of token is a number. This is different than what we have
-    // seen before because a number could be any number of characters and we
-    // want to capture the entire sequence of characters as one token.
+    // 令牌的下一个类型是数字。这和我们之前的处理方式不太一样，因为数字可以是任意
+    // 数量的字符，我们希望将整个字符序列捕获为一个令牌。
     //
     //   (add 123 456)
     //        ^^^ ^^^
-    //        Only two separate tokens
+    //        只有两个不同的令牌
     //
-    // So we start this off when we encounter the first number in a sequence.
+    // 所以当我们遇到第一个数字序列时，我们就从第一个数字开始。
     let NUMBERS = /[0-9]/;
     if (NUMBERS.test(char)) {
 
-      // We're going to create a `value` string that we are going to push
-      // characters to.
+      // 我们创建一个 `value` 字符串然后把遇到的数字添加到这个字符串中。
       let value = '';
 
-      // Then we're going to loop through each character in the sequence until
-      // we encounter a character that is not a number, pushing each character
-      // that is a number to our `value` and incrementing `current` as we go.
+      // 然后我们将循环遍历序列中的每一个字符，直到遇到一个不是数字的字符，将
+      // 每个数字字符添加到我们的 `value` 中，并在此过程自增 `current`
       while (NUMBERS.test(char)) {
         value += char;
         char = input[++current];
       }
 
-      // After that we push our `number` token to the `tokens` array.
+      // 之后我们添加我们的 `number` 令牌到我们的 `tokens` 数组中。
       tokens.push({ type: 'number', value });
 
-      // And we continue on.
+      // 然后我们进入下一个循环。
       continue;
     }
 
-    // We'll also add support for strings in our language which will be any
-    // text surrounded by double quotes (").
+    // 我们还将在我们的语言中添加对字符串的支持，它将是任何被双引号包围的文本。
     //
     //   (concat "foo" "bar")
-    //            ^^^   ^^^ string tokens
+    //            ^^^   ^^^ 字符串令牌
     //
-    // We'll start by checking for the opening quote:
+    // 我们将从检查开头的引号开始：
     if (char === '"') {
-      // Keep a `value` variable for building up our string token.
+      // 保留一个 `value` 变量来构建我们的字符串令牌。
       let value = '';
 
-      // We'll skip the opening double quote in our token.
+      // 我们跳过令牌开头的双引号。
       char = input[++current];
 
-      // Then we'll iterate through each character until we reach another
-      // double quote.
+      // 我们迭代遍历每一个字符直到遇到另一个双引号。
       while (char !== '"') {
         value += char;
         char = input[++current];
       }
 
-      // Skip the closing double quote.
+      // 跳过结尾的双引号。
       char = input[++current];
 
-      // And add our `string` token to the `tokens` array.
+      // 之后我们添加我们的 `string` 令牌到我们的 `tokens` 数组中。
       tokens.push({ type: 'string', value });
 
       continue;
     }
 
-    // The last type of token will be a `name` token. This is a sequence of
-    // letters instead of numbers, that are the names of functions in our lisp
-    // syntax.
+    // 最后一种令牌类型是 `名称（name）` 令牌。这是一个字母序列，而不是数字序列，
+    // 这是我们 LISP 语法中的函数名称。
     //
     //   (add 2 4)
     //    ^^^
-    //    Name token
+    //    名称令牌
     //
     let LETTERS = /[a-z]/i;
     if (LETTERS.test(char)) {
       let value = '';
 
-      // Again we're just going to loop through all the letters pushing them to
-      // a value.
+      // 同样的我们遍历所有的字母并把它添加到我们的 value 变量中。
       while (LETTERS.test(char)) {
         value += char;
         char = input[++current];
       }
 
-      // And pushing that value as a token with the type `name` and continuing.
+      // 然后将该值作为 `name` 类型添加到令牌数组中并继续。
       tokens.push({ type: 'name', value });
 
       continue;
     }
 
-    // Finally if we have not matched a character by now, we're going to throw
-    // an error and completely exit.
+    // 最后，如果我们现在还有没匹配的字符，我们将抛出一个错误并完全退出。
     throw new TypeError('I dont know what this character is: ' + char);
   }
 
-  // Then at the end of our `tokenizer` we simply return the tokens array.
+  // 在`词法分析器`的最后，我们简单的返回令牌数组。
   return tokens;
 }
 
 /**
  * ============================================================================
  *                                 ヽ/❀o ل͜ o\ﾉ
- *                                THE PARSER!!!
+ *                                 语法解析器!!!
  * ============================================================================
  */
 
 /**
- * For our parser we're going to take our array of tokens and turn it into an
- * AST.
+ * 对于我们的解析器，我们将把令牌数组转换成抽象语法树（AST）。
  *
  *   [{ type: 'paren', value: '(' }, ...]   =>   { type: 'Program', body: [...] }
  */
 
-// Okay, so we define a `parser` function that accepts our array of `tokens`.
+// 所以我们定义一个 `parser` 函数来接受我们的 `tokens` 数组。
 function parser(tokens) {
 
-  // Again we keep a `current` variable that we will use as a cursor.
+  // 同样的我们保留一个 `current` 变量，将其用作指针。
   let current = 0;
 
-  // But this time we're going to use recursion instead of a `while` loop. So we
-  // define a `walk` function.
+  // 不过这一次我们使用递归替代 `while` 循环。所以我们定义了一个 `walk` 函数。
   function walk() {
 
-    // Inside the walk function we start by grabbing the `current` token.
+    // 在 walk 函数内我们获取 `current` 指向的令牌。
     let token = tokens[current];
 
-    // We're going to split each type of token off into a different code path,
-    // starting off with `number` tokens.
+    // 我们将从 `number` 令牌开始，把每种类型的令牌拆分为不同的代码路径。
     //
-    // We test to see if we have a `number` token.
+    // 我们测试看看是否有一个 `number` 令牌。
     if (token.type === 'number') {
 
-      // If we have one, we'll increment `current`.
+      // 如果我们有，我们先自增 `current`。
       current++;
 
-      // And we'll return a new AST node called `NumberLiteral` and setting its
-      // value to the value of our token.
+      // 然后我们返回一个类型为 `NumberLiteral` 的新AST节点，并且把它的值设置为令牌的值。
       return {
         type: 'NumberLiteral',
         value: token.value,
       };
     }
 
-    // If we have a string we will do the same as number and create a
-    // `StringLiteral` node.
+    // 如果我们有一个字符串，我们和 number 一样创建一个 `StringLiteral` 节点。
     if (token.type === 'string') {
       current++;
 
@@ -699,44 +536,38 @@ function parser(tokens) {
       };
     }
 
-    // Next we're going to look for CallExpressions. We start this off when we
-    // encounter an open parenthesis.
+    // 接下来我们去寻找 CallExpression。从我们遇到左括号开始。
     if (
       token.type === 'paren' &&
       token.value === '('
     ) {
 
-      // We'll increment `current` to skip the parenthesis since we don't care
-      // about it in our AST.
+      // 我们自增 `current` 去跳过括号这部分，因为在 AST 中我们不需要关心这个。
       token = tokens[++current];
 
-      // We create a base node with the type `CallExpression`, and we're going
-      // to set the name as the current token's value since the next token after
-      // the open parenthesis is the name of the function.
+      // 我们创建了一个类型为 `CallExpression` 的基本节点，然后我们把令牌的值
+      // 设置到 name 字段中，因为括号后紧跟的就是调用函数的名称。
       let node = {
         type: 'CallExpression',
         name: token.value,
         params: [],
       };
 
-      // We increment `current` *again* to skip the name token.
+      // 我们*再一次*自增 `current` 去跳过函数名称这个令牌。
       token = tokens[++current];
 
-      // And now we want to loop through each token that will be the `params` of
-      // our `CallExpression` until we encounter a closing parenthesis.
+      // 然后我们需要通过循环接下来的每一个令牌，这些令牌将是 `CallExpression`
+      // 的 `params` 字段，直到我们遇到了闭括号为止。
+      // 
+      // 现在正是递归的用武之地。我们应该使用递归去解决这些问题，而不是试图去解析
+      // 可能无限嵌套的节点集。
       //
-      // Now this is where recursion comes in. Instead of trying to parse a
-      // potentially infinitely nested set of nodes we're going to rely on
-      // recursion to resolve things.
-      //
-      // To explain this, let's take our Lisp code. You can see that the
-      // parameters of the `add` are a number and a nested `CallExpression` that
-      // includes its own numbers.
+      // 为了解释这个，让我们以 LISP 代码为例。你可以看到 `add` 方法的参数是一个数字
+      // 和一个嵌套的 `CallExpression` 这个 `CallExpression` 包含了自己的数字
       //
       //   (add 2 (subtract 4 2))
       //
-      // You'll also notice that in our tokens array we have multiple closing
-      // parenthesis.
+      // 你同样会注意到我们的令牌数组中有有多个闭括号。
       //
       //   [
       //     { type: 'paren',  value: '('        },
@@ -750,47 +581,39 @@ function parser(tokens) {
       //     { type: 'paren',  value: ')'        }, <<< Closing parenthesis
       //   ]
       //
-      // We're going to rely on the nested `walk` function to increment our
-      // `current` variable past any nested `CallExpression`.
+      // 我们将依赖嵌套的 `walk` 方法去自增我们的 `current` 变量去处理所有嵌套的 `CallExpression`
 
-      // So we create a `while` loop that will continue until it encounters a
-      // token with a `type` of `'paren'` and a `value` of a closing
-      // parenthesis.
+      // 所以我们创建一个 `while` 循环，一直循环直到遇到了一个 `type` 为 `paren` 并且值为闭括号的令牌。
       while (
         (token.type !== 'paren') ||
         (token.type === 'paren' && token.value !== ')')
       ) {
-        // we'll call the `walk` function which will return a `node` and we'll
-        // push it into our `node.params`.
+        // 我们调用 `walk` 方法，它会返回一个 `node`，然后我们把返回的节点
+        // 添加到我们的 `node.params` 中。
         node.params.push(walk());
         token = tokens[current];
       }
 
-      // Finally we will increment `current` one last time to skip the closing
-      // parenthesis.
+      // 最后我们再一次自增 `current` 去跳过闭括号。
       current++;
 
-      // And return the node.
+      // 然后返回这个节点。
       return node;
     }
 
-    // Again, if we haven't recognized the token type by now we're going to
-    // throw an error.
+    // 同样，如果我们到这一步还有没有识别出令牌类型，我们将抛出一个错误。
     throw new TypeError(token.type);
   }
 
-  // Now, we're going to create our AST which will have a root which is a
-  // `Program` node.
+  // 现在，我们将创建我们的 AST，它的根节点是一个 `Program` 节点。
   let ast = {
     type: 'Program',
     body: [],
   };
 
-  // And we're going to kickstart our `walk` function, pushing nodes to our
-  // `ast.body` array.
+  // 然后我们运行我们的 `walk` 方法，添加节点进我们的 `ast.body` 数组。
   //
-  // The reason we are doing this inside a loop is because our program can have
-  // `CallExpression` after one another instead of being nested.
+  // 我们在这里做一个循环的原因是，我们的程序可以是多行的 `CallExpression` ，不一定是嵌套的。
   //
   //   (add 2 2)
   //   (subtract 4 2)
@@ -799,21 +622,20 @@ function parser(tokens) {
     ast.body.push(walk());
   }
 
-  // At the end of our parser we'll return the AST.
+  // 在我们的解析器最后，返回抽象语法树。
   return ast;
 }
 
 /**
  * ============================================================================
  *                                 ⌒(❀>◞౪◟<❀)⌒
- *                               THE TRAVERSER!!!
+ *                                      遍历!!!
  * ============================================================================
  */
 
 /**
- * So now we have our AST, and we want to be able to visit different nodes with
- * a visitor. We need to be able to call the methods on the visitor whenever we
- * encounter a node with a matching type.
+ * 现在我们有了 AST，我们希望访问器能够访问不同类型的节点。我们需要能够在遇到类型匹配的
+ * 节点时调用访问器上的方法。
  *
  *   traverse(ast, {
  *     Program: {
@@ -845,88 +667,84 @@ function parser(tokens) {
  *   });
  */
 
-// So we define a traverser function which accepts an AST and a
-// visitor. Inside we're going to define two functions...
+// 所以我们定义一个遍历函数，接收一个 AST 和一个 访问器。在函数里我们将定义两个
+// 函数...
 function traverser(ast, visitor) {
 
-  // A `traverseArray` function that will allow us to iterate over an array and
-  // call the next function that we will define: `traverseNode`.
+  // 一个 `traverseArray` 函数，它允许我们遍历一个数组并调用下一个定义的函数：
+  // `traverseNode`。
   function traverseArray(array, parent) {
     array.forEach(child => {
       traverseNode(child, parent);
     });
   }
 
-  // `traverseNode` will accept a `node` and its `parent` node. So that it can
-  // pass both to our visitor methods.
+  // `traverseNode` 接收一个节点 `node` 和这个节点的父引用 `parent`。这样
+  // 它就可以同时把这两个参数传递给我们访问器里的方法。
   function traverseNode(node, parent) {
 
-    // We start by testing for the existence of a method on the visitor with a
-    // matching `type`.
+    // 我们首先测试在访问者上是否存在一个匹配的 `类型 (type)`。
     let methods = visitor[node.type];
 
-    // If there is an `enter` method for this node type we'll call it with the
-    // `node` and its `parent`.
+    // 如果这个节点类型有定义 `进入 (enter)` 方法，我们将以 `node` 和 `parent`
+    // 作为参数调用这个方法。
     if (methods && methods.enter) {
       methods.enter(node, parent);
     }
 
-    // Next we are going to split things up by the current node type.
+    // 接下来，我们将根据当前节点类型来拆分内容。
     switch (node.type) {
 
-      // We'll start with our top level `Program`. Since Program nodes have a
-      // property named body that has an array of nodes, we will call
-      // `traverseArray` to traverse down into them.
+      // 我们将从最顶层的 `程序 (Program)` 开始。因为程序节点有一个 body 属性，
+      // 是一个数组，所以我们调用 `traverseArray` 来遍历它们。
       //
-      // (Remember that `traverseArray` will in turn call `traverseNode` so  we
-      // are causing the tree to be traversed recursively)
+      // (记住，这个 `traverseArray` 将会依次调用 `traverseNode` 所以
+      // 这个树将会被递归的遍历)
       case 'Program':
         traverseArray(node.body, node);
         break;
 
-      // Next we do the same with `CallExpression` and traverse their `params`.
+      // 下一步我们对 `CallExpression` 执行与上面相同的操作，遍历它的 `params`。
       case 'CallExpression':
         traverseArray(node.params, node);
         break;
 
-      // In the cases of `NumberLiteral` and `StringLiteral` we don't have any
-      // child nodes to visit, so we'll just break.
+      // 在 `NumberLiteral` 和 `StringLiteral` 的情况下，我们没有任何要访问的
+      // 子节点，所以我们直接中断。
       case 'NumberLiteral':
       case 'StringLiteral':
         break;
 
-      // And again, if we haven't recognized the node type then we'll throw an
-      // error.
+      // 又一次，如果我们还有未识别的节点类型，我们抛出一个错误
       default:
         throw new TypeError(node.type);
     }
 
-    // If there is an `exit` method for this node type we'll call it with the
-    // `node` and its `parent`.
+    // 如果这个节点类型有定义 `离开 (exit)` 方法，我们将以 `node` 和 `parent`
+    // 作为参数调用这个方法。
     if (methods && methods.exit) {
       methods.exit(node, parent);
     }
   }
 
-  // Finally we kickstart the traverser by calling `traverseNode` with our ast
-  // with no `parent` because the top level of the AST doesn't have a parent.
+  // 最后，我们通过调用 `traverseNode` 来启动我们的遍历器，因为这里的 ast 是
+  // 最顶层的元素，没有父元素，所以 `parent` 参数我们传一个空值。
   traverseNode(ast, null);
 }
 
 /**
  * ============================================================================
  *                                   ⁽(◍˃̵͈̑ᴗ˂̵͈̑)⁽
- *                              THE TRANSFORMER!!!
+ *                                    转换器!!!
  * ============================================================================
  */
 
 /**
- * Next up, the transformer. Our transformer is going to take the AST that we
- * have built and pass it to our traverser function with a visitor and will
- * create a new ast.
+ * 接下来是转换器。我们的转换器将拿我们构建的 AST 和一个访问者（visitor）一起
+ * 传递给我们的遍历函数，它将会创建一个全新的 AST。
  *
  * ----------------------------------------------------------------------------
- *   Original AST                     |   Transformed AST
+ *   原始的 AST                       |   转换后的 AST
  * ----------------------------------------------------------------------------
  *   {                                |   {
  *     type: 'Program',               |     type: 'Program',
@@ -954,41 +772,37 @@ function traverser(ast, visitor) {
  *                                    |             type: 'NumberLiteral',
  *                                    |             value: '2'
  *                                    |           }]
- *  (sorry the other one is longer.)  |         }
+ *      (抱歉，另一个更长一些。)        |         }
  *                                    |       }
  *                                    |     }]
  *                                    |   }
  * ----------------------------------------------------------------------------
  */
 
-// So we have our transformer function which will accept the lisp ast.
+// 所以我们有了转换函数，接收 LISP 的抽象语法树。
 function transformer(ast) {
 
-  // We'll create a `newAst` which like our previous AST will have a program
-  // node.
+  // 我们创建一个 `newAst` 它和之前的抽象语法树一样有一个程序节点。
   let newAst = {
     type: 'Program',
     body: [],
   };
 
-  // Next I'm going to cheat a little and create a bit of a hack. We're going to
-  // use a property named `context` on our parent nodes that we're going to push
-  // nodes to their parent's `context`. Normally you would have a better
-  // abstraction than this, but for our purposes this keeps things simple.
+  // 接下来，我们要使用些技巧。我们将在父节点上使用一个名为 `context` 的属性，
+  // 并将节点添加到父节点的 `context` 中。通常情况下会让这个变得更抽象，但是
+  // 对于我们的目的来说，这会让事情更简单。
   //
-  // Just take note that the context is a reference *from* the old ast *to* the
-  // new ast.
+  // 注意，这里的上下文是旧的 AST 对新的 AST 的引用。
   ast._context = newAst.body;
 
-  // We'll start by calling the traverser function with our ast and a visitor.
+  // 我们开始调用遍历函数，并传入我们的 AST 和访问者。
   traverser(ast, {
 
-    // The first visitor method accepts any `NumberLiteral`
+    // 第一个访问者方法接受任何的 `NumberLiteral`
     NumberLiteral: {
-      // We'll visit them on enter.
+      // 我们在节点进入时访问它
       enter(node, parent) {
-        // We'll create a new node also named `NumberLiteral` that we will push to
-        // the parent context.
+        // 我们将创建一个叫 `NumberLiteral` 的新节点，并将它会添加到父节点的上下文中。
         parent._context.push({
           type: 'NumberLiteral',
           value: node.value,
@@ -996,7 +810,7 @@ function transformer(ast) {
       },
     },
 
-    // Next we have `StringLiteral`
+    // 下一个是 `StringLiteral`
     StringLiteral: {
       enter(node, parent) {
         parent._context.push({
@@ -1006,7 +820,7 @@ function transformer(ast) {
       },
     },
 
-    // Next up, `CallExpression`.
+    // 接下来是 `CallExpression`
     CallExpression: {
       enter(node, parent) {
 
@@ -1046,8 +860,7 @@ function transformer(ast) {
     }
   });
 
-  // At the end of our transformer function we'll return the new ast that we
-  // just created.
+  // 在转换器的最后，我们将返回刚刚创建的新 AST。
   return newAst;
 }
 
@@ -1118,13 +931,12 @@ function codeGenerator(node) {
 /**
  * ============================================================================
  *                                  (۶* ‘ヮ’)۶”
- *                         !!!!!!!!THE COMPILER!!!!!!!!
+ *                            !!!!!!!!编译器!!!!!!!!
  * ============================================================================
  */
 
 /**
- * FINALLY! We'll create our `compiler` function. Here we will link together
- * every part of the pipeline.
+ * 终于！我们创建了我们 `compiler` 函数。这里我们将管道的每个部分连接起来。
  *
  *   1. input  => tokenizer   => tokens
  *   2. tokens => parser      => ast
@@ -1138,18 +950,18 @@ function compiler(input) {
   let newAst = transformer(ast);
   let output = codeGenerator(newAst);
 
-  // and simply return the output!
+  // 然后简单的返回输出！
   return output;
 }
 
 /**
  * ============================================================================
  *                                   (๑˃̵ᴗ˂̵)و
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!YOU MADE IT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!你做到了!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * ============================================================================
  */
 
-// Now I'm just exporting everything...
+// 现在，我们把所有东西都导出去...
 module.exports = {
   tokenizer,
   parser,

@@ -1,3 +1,5 @@
+English | [简体中文](README-zh_CN.md)
+
 [![The Super Tiny Compiler](https://cloud.githubusercontent.com/assets/952783/21579290/5755288a-cf75-11e6-90e0-029529a44a38.png)](the-super-tiny-compiler.js)
 
 ***Welcome to The Super Tiny Compiler!***
@@ -7,8 +9,6 @@ written in easy to read JavaScript.
 
 Reading through the guided code will help you learn about how *most* compilers
 work from end to end.
-
-English | [简体中文](README-zh_CN.md)
 
 ### [Want to jump into the code? Click here](the-super-tiny-compiler.js)
 
