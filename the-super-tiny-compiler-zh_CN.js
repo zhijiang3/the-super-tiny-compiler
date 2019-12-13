@@ -824,8 +824,7 @@ function transformer(ast) {
     CallExpression: {
       enter(node, parent) {
 
-        // We start creating a new node `CallExpression` with a nested
-        // `Identifier`.
+        // 我们创建一个 `CallExpression` 节点，里面有一个嵌套的 `Identifier`。
         let expression = {
           type: 'CallExpression',
           callee: {
@@ -835,26 +834,22 @@ function transformer(ast) {
           arguments: [],
         };
 
-        // Next we're going to define a new context on the original
-        // `CallExpression` node that will reference the `expression`'s arguments
-        // so that we can push arguments.
+        // 然后我们在 `CallExpression` 节点上定义一个 context 属性，它将引用 expression 的
+        // arguments 属性，以便我们向 arguments 中添加参数。
         node._context = expression.arguments;
 
-        // Then we're going to check if the parent node is a `CallExpression`.
-        // If it is not...
+        // 然后我们检查下父节点的类型是不是 `CallExpression`，如果不是的话
         if (parent.type !== 'CallExpression') {
 
-          // We're going to wrap our `CallExpression` node with an
-          // `ExpressionStatement`. We do this because the top level
-          // `CallExpression` in JavaScript are actually statements.
+          // 我们通过 `ExpressionStatement` 包装我们的 `CallExpression` 节点。我们这样做
+          // 是因为，在 JavaScript 中，最顶层的 `CallExpression` 实际上是一条语句。
           expression = {
             type: 'ExpressionStatement',
             expression: expression,
           };
         }
 
-        // Last, we push our (possibly wrapped) `CallExpression` to the `parent`'s
-        // `context`.
+        // 最后，我们添加（可能经过 ExpressionStatement 包装的） `CallExpression` 到父节点的 context 中。
         parent._context.push(expression);
       },
     }
@@ -867,40 +862,38 @@ function transformer(ast) {
 /**
  * ============================================================================
  *                               ヾ（〃＾∇＾）ﾉ♪
- *                            THE CODE GENERATOR!!!!
+ *                                代码生成器!!!!
  * ============================================================================
  */
 
 /**
- * Now let's move onto our last phase: The Code Generator.
+ * 现在让我们继续我们的最后一个节点：代码生成器。
  *
- * Our code generator is going to recursively call itself to print each node in
- * the tree into one giant string.
+ * 我们的代码生成器将会递归的调用自身，去打印树中的每一个节点到一个很长的字符串中。
  */
 
 function codeGenerator(node) {
 
-  // We'll break things down by the `type` of the `node`.
+  // 对于不同的节点，我们分开处理
   switch (node.type) {
 
-    // If we have a `Program` node. We will map through each node in the `body`
-    // and run them through the code generator and join them with a newline.
+    // 如果是 `Program` 节点，我们将为 `body` 属性的每一个节点映射到 codeGenerator 方法中调用，
+    // 然后把输出的结果通过换行符合并。
     case 'Program':
       return node.body.map(codeGenerator)
         .join('\n');
 
-    // For `ExpressionStatement` we'll call the code generator on the nested
-    // expression and we'll add a semicolon...
+    // 对于 `ExpressionStatement` 节点，我们对它的 expression 属性递归调用 codeGenerator，
+    // 并且我们会在表达式结尾添加一个分号。
     case 'ExpressionStatement':
       return (
         codeGenerator(node.expression) +
-        ';' // << (...because we like to code the *correct* way)
+        ';' // << (...因为我们喜欢用“正确”的方式编码)
       );
 
-    // For `CallExpression` we will print the `callee`, add an open
-    // parenthesis, we'll map through each node in the `arguments` array and run
-    // them through the code generator, joining them with a comma, and then
-    // we'll add a closing parenthesis.
+    // 对于 `CallExpression` 我们将会打印 `callee`，然后添加一个开括号，接着我们
+    // 映射 `arguments`数组的每一个节点，通过 codeGenerator 方法调用它，最后把
+    // 结果通过一个逗号合并，然后添加闭括号。
     case 'CallExpression':
       return (
         codeGenerator(node.callee) +
@@ -910,19 +903,19 @@ function codeGenerator(node) {
         ')'
       );
 
-    // For `Identifier` we'll just return the `node`'s name.
+    // 对于 `Identifier` 我们会返回节点的 `name (名称)`。
     case 'Identifier':
       return node.name;
 
-    // For `NumberLiteral` we'll just return the `node`'s value.
+    // 对于 `NumberLiteral` 我们返回节点的 `value (值)`。
     case 'NumberLiteral':
       return node.value;
 
-    // For `StringLiteral` we'll add quotations around the `node`'s value.
+    // 对于 `StringLiteral` 我们通过双引号包裹节点的 `value (值)`。
     case 'StringLiteral':
       return '"' + node.value + '"';
 
-    // And if we haven't recognized the node, we'll throw an error.
+    // 然后如果我们有未识别的节点，我们抛出一个错误。
     default:
       throw new TypeError(node.type);
   }
@@ -936,7 +929,7 @@ function codeGenerator(node) {
  */
 
 /**
- * 终于！我们创建了我们 `compiler` 函数。这里我们将管道的每个部分连接起来。
+ * 终于！我们创建了我们 `compiler` 函数。函数只是把上面说到的连接起来。
  *
  *   1. input  => tokenizer   => tokens
  *   2. tokens => parser      => ast
